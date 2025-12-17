@@ -1,5 +1,8 @@
 package com.company.project.StudentAPI.service;
 
+import com.company.project.StudentAPI.dto.StudentCreateDTO;
+import com.company.project.StudentAPI.dto.StudentUpdateDTO;
+import com.company.project.StudentAPI.exception.ResourceNotFoundException;
 import com.company.project.StudentAPI.model.Student;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -11,9 +14,9 @@ public class StudentServiceImpl implements StudentService {
     private Long nextId = 4L;
 
     public StudentServiceImpl() {
-        students.add(new Student(1L, "Mason", 20));
-        students.add(new Student(2L, "Bruno", 22));
-        students.add(new Student(3L, "Bryan", 19));
+        students.add(new Student(1L, "Mason", "mason@gmail.com",20));
+        students.add(new Student(2L, "Bruno", "bruno@gmail.com",22));
+        students.add(new Student(3L, "Bryan", "bryan@gmail.com",19));
     }
 
     @Override
@@ -26,14 +29,37 @@ public class StudentServiceImpl implements StudentService {
         return students.stream()
                 .filter(s -> s.getId().equals(id))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Can not find student with id: " + id));
     }
 
     @Override
-    public Student createStudent(Student student) {
+    public Student createStudent(StudentCreateDTO dto) {
+        Student student = new Student();
         student.setId(nextId++);
+        student.setName(dto.getName());
+        student.setEmail(dto.getEmail());
+        student.setAge(dto.getAge());
+
         students.add(student);
+
         return student;
     }
 
+    @Override
+    public Student updateStudent(Long id, StudentUpdateDTO dto) {
+        Student student = students.stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Can not find student with id: " + id));
+
+        if (student == null) {
+            return null;
+        }
+
+        student.setName(dto.getName());
+        student.setEmail(dto.getEmail());
+        student.setAge(dto.getAge());
+
+        return student;
+    }
 }

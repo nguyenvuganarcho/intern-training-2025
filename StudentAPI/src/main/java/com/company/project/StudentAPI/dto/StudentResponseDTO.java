@@ -1,11 +1,11 @@
-package com.company.project.StudentAPI.model;
+package com.company.project.StudentAPI.dto;
 
 import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Student {
+public class StudentResponseDTO {
     private Long id;
     private String name;
     private String email;
