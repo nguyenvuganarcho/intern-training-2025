@@ -52,10 +52,6 @@ public class StudentServiceImpl implements StudentService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Can not find student with id: " + id));
 
-        if (student == null) {
-            return null;
-        }
-
         student.setName(dto.getName());
         student.setEmail(dto.getEmail());
         student.setAge(dto.getAge());
