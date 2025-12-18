@@ -1,6 +1,6 @@
 package com.company.project.StudentAPI.controller;
 
-import com.company.project.StudentAPI.model.Student;
+import com.company.project.StudentAPI.Entity.StudentEntity;
 import com.company.project.StudentAPI.service.StudentService;
 import com.company.project.StudentAPI.dto.StudentCreateDTO;
 import com.company.project.StudentAPI.dto.StudentUpdateDTO;
@@ -21,18 +21,18 @@ public class StudentController {
     private StudentService studentService;
 
     // helper method
-    private StudentResponseDTO convertToResponseDTO(Student student) {
+    private StudentResponseDTO convertToResponseDTO(StudentEntity studentEntity) {
             return new StudentResponseDTO(
-                    student.getId(),
-                    student.getName(),
-                    student.getEmail(),
-                    student.getAge()
+                    studentEntity.getId(),
+                    studentEntity.getName(),
+                    studentEntity.getEmail(),
+                    studentEntity.getAge()
             );
     }
 
     @GetMapping
     public ResponseEntity<List<StudentResponseDTO>> getAllStudents() {
-        List<Student> students = studentService.getAllStudents();
+        List<StudentEntity> students = studentService.getAllStudents();
 
         List<StudentResponseDTO> response = students.stream()
                 .map(this::convertToResponseDTO)
@@ -42,15 +42,15 @@ public class StudentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<StudentResponseDTO> getStudentById(@PathVariable Long id) {
-        Student student = studentService.getStudentById(id);
+        StudentEntity studentEntity = studentService.getStudentById(id);
 
-        StudentResponseDTO response = convertToResponseDTO(student);
+        StudentResponseDTO response = convertToResponseDTO(studentEntity);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
     public ResponseEntity<StudentResponseDTO> createStudent(@Valid @RequestBody StudentCreateDTO student) {
-        Student created = studentService.createStudent(student);
+        StudentEntity created = studentService.createStudent(student);
         StudentResponseDTO response = convertToResponseDTO(created);
 
         return ResponseEntity
@@ -63,9 +63,15 @@ public class StudentController {
             @PathVariable Long id,
             @Valid @RequestBody StudentUpdateDTO dto
     ) {
-        Student updated = studentService.updateStudent(id, dto);
+        StudentEntity updated = studentService.updateStudent(id, dto);
 
         StudentResponseDTO response = convertToResponseDTO(updated);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
+        studentService.deleteStudent(id);
+        return ResponseEntity.noContent().build();
     }
 }

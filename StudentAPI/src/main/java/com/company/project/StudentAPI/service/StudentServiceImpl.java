@@ -1,61 +1,75 @@
 package com.company.project.StudentAPI.service;
 
+import com.company.project.StudentAPI.StudentApiApplication;
 import com.company.project.StudentAPI.dto.StudentCreateDTO;
 import com.company.project.StudentAPI.dto.StudentUpdateDTO;
+import com.company.project.StudentAPI.exception.DuplicateEmailException;
 import com.company.project.StudentAPI.exception.ResourceNotFoundException;
-import com.company.project.StudentAPI.model.Student;
+import com.company.project.StudentAPI.Entity.StudentEntity;
+import com.company.project.StudentAPI.repository.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class StudentServiceImpl implements StudentService {
-    private List<Student> students = new ArrayList<>();
-    private Long nextId = 4L;
 
-    public StudentServiceImpl() {
-        students.add(new Student(1L, "Mason", "mason@gmail.com",20));
-        students.add(new Student(2L, "Bruno", "bruno@gmail.com",22));
-        students.add(new Student(3L, "Bryan", "bryan@gmail.com",19));
+    @Autowired
+    private StudentRepository studentRepository;
+
+
+    @Override
+    public List<StudentEntity> getAllStudents() {
+        return studentRepository.findAll();
     }
 
     @Override
-    public List<Student> getAllStudents() {
-        return students;
-    }
-
-    @Override
-    public Student getStudentById(Long id) {
-        return students.stream()
-                .filter(s -> s.getId().equals(id))
-                .findFirst()
+    public StudentEntity getStudentById(Long id) {
+        return studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Can not find student with id: " + id));
     }
 
     @Override
-    public Student createStudent(StudentCreateDTO dto) {
-        Student student = new Student();
-        student.setId(nextId++);
-        student.setName(dto.getName());
-        student.setEmail(dto.getEmail());
-        student.setAge(dto.getAge());
+    public StudentEntity createStudent(StudentCreateDTO dto) {
+        if (studentRepository.existsByEmail(dto.getEmail())) {
+            throw new DuplicateEmailException("Email exists: " + dto.getEmail());
+        }
+        StudentEntity studentEntity = new StudentEntity();
+        studentEntity.setName(dto.getName());
+        studentEntity.setEmail(dto.getEmail());
+        studentEntity.setAge(dto.getAge());
+        studentEntity.setCreatedAt(LocalDateTime.now());
 
-        students.add(student);
-
-        return student;
+        return studentRepository.save(studentEntity);
     }
 
     @Override
-    public Student updateStudent(Long id, StudentUpdateDTO dto) {
-        Student student = students.stream()
-                .filter(s -> s.getId().equals(id))
-                .findFirst()
+    public StudentEntity updateStudent(Long id, StudentUpdateDTO dto) {
+        StudentEntity studentEntity = studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Can not find student with id: " + id));
 
-        student.setName(dto.getName());
-        student.setEmail(dto.getEmail());
-        student.setAge(dto.getAge());
+        if (!studentEntity.getEmail().equals(dto.getEmail())
+                && studentRepository.existsByEmail(dto.getEmail())) {
+            throw new DuplicateEmailException("Email exits: " + dto.getEmail());
+            // ↑ Đổi từ IllegalArgumentException
+        }
 
-        return student;
+        studentEntity.setName(dto.getName());
+        studentEntity.setEmail(dto.getEmail());
+        studentEntity.setAge(dto.getAge());
+
+        return studentRepository.save(studentEntity);
+    }
+
+    @Override
+    public void deleteStudent(Long id) {
+        if (!studentRepository.existsById(id)) {
+                throw new ResourceNotFoundException("Can not find student with id: " + id);
+        }
+
+        studentRepository.deleteById(id);
     }
 }
