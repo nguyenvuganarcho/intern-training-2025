@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ErrorResponse {
     private boolean success;
-    private String Error;
+    private String errorCode;
     private String message;
     private List<FieldError> errors;
     private LocalDateTime timestamp;

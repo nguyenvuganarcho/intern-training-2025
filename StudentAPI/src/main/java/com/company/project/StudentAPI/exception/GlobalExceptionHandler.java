@@ -13,6 +13,35 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> handleBaseException(BaseException ex) {
+        HttpStatus status;
+
+        switch (ex.getErrorCode()) {
+            case STUDENT_NOT_FOUND:
+                status = HttpStatus.NOT_FOUND;  // 404
+                break;
+            case EMAIL_ALREADY_EXISTS:
+                status = HttpStatus.CONFLICT;   // 409
+                break;
+            case INVALID_INPUT:
+                status = HttpStatus.BAD_REQUEST; // 400
+                break;
+            default:
+                status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
+                break;
+        }
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                false,
+                ex.getCode(),
+                ex.getMessage(),
+                null,
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(status).body(errorResponse);
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
         List<ErrorResponse.FieldError> fieldErrors = new ArrayList<>();
@@ -36,23 +65,6 @@ public class GlobalExceptionHandler {
                 .body(errorResponse);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundException(
-            ResourceNotFoundException ex
-    ) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                false,
-                "NOT_FOUND",
-                ex.getMessage(),
-                null,
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(errorResponse);
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -67,21 +79,5 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errorResponse);
     }
-
-    @ExceptionHandler(DuplicateEmailException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateEmailException(DuplicateEmailException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                false,
-                "DUPLICATE_EMAIL",
-                ex.getMessage(),
-                null,
-                LocalDateTime.now()
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(errorResponse);
-    }
-
 }
 
