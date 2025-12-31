@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { AuthRepository } from './auth.repo';
 import {
   RegisterRequestDto,
@@ -26,6 +27,24 @@ export class AuthService {
       updatedAt: user.updatedAt.toISOString(),
     };
   }
+
+   private generateToken(user: any): string {
+    const payload = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    };
+
+    const secret = process.env.JWT_SECRET || 'dev-secret-key';
+    console.log('🔑 Secret khi tạo token:', secret);
+    const expiresIn = parseInt(process.env.JWT_EXPIRES_IN || '3600', 10);
+
+    const token = jwt.sign(payload, secret, { expiresIn });
+    console.log('✅ Token created:', token);
+    
+    return token;
+  } 
 
   async register(registerDto: RegisterRequestDto): Promise<UserResponseDto> {
     if (this.repo.existsByEmail(registerDto.email)) {
@@ -56,7 +75,7 @@ export class AuthService {
       throw new UnauthorizedError('Invalid credentials');
     }
 
-    const token = 'MOCK-TOKEN-DAY-2';
+    const token = this.generateToken(user);
 
     return {
       token,

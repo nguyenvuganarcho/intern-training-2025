@@ -16,6 +16,12 @@ export class ValidationError extends AppError {
   }
 }
 
+export class NotFoundError extends AppError {
+  constructor(resource: string) {
+    super(404, `${resource} not found`, 'NOT_FOUND');
+  }
+}
+
 export class UnauthorizedError extends AppError {
   constructor(message: string = 'Unauthorized') {
     super(401, message, 'UNAUTHORIZED');
