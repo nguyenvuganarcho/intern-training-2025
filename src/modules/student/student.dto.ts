@@ -11,6 +11,11 @@ export interface CreateStudentDto {
   email: string;
 }
 
+export interface UpdateStudentDto {
+  name?: string;
+  email?: string;
+}
+
 export interface StudentResponseDto {
   id: number;
   name: string;
