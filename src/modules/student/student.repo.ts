@@ -1,4 +1,4 @@
-import { Student, CreateStudentDto, UpdateStudentDto } from "./student.dto";
+import { Student, CreateStudentDto, UpdateStudentDto } from './student.dto';
 
 export class StudentRepository {
   private students: Student[] = [];
@@ -18,8 +18,29 @@ export class StudentRepository {
     return student;
   }
 
-  findAll(): Student[] {
-    return this.students;
+  findAll(page?: number, size?: number, search?: string): { students: Student[]; total: number } {
+    let filtered = [...this.students];
+
+    // Search by name or email
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(
+        (s) =>
+          s.name.toLowerCase().includes(searchLower) ||
+          s.email.toLowerCase().includes(searchLower)
+      );
+    }
+
+    const total = filtered.length;
+
+    // Pagination
+    if (page && size) {
+      const start = (page - 1) * size;
+      const end = start + size;
+      filtered = filtered.slice(start, end);
+    }
+
+    return { students: filtered, total };
   }
 
   findById(id: number): Student | undefined {
@@ -49,5 +70,11 @@ export class StudentRepository {
 
     this.students.splice(index, 1);
     return true;
+  }
+
+  existsByEmail(email: string, excludeId?: number): boolean {
+    return this.students.some(
+      (s) => s.email.toLowerCase() === email.toLowerCase() && s.id !== excludeId
+    );
   }
 }

@@ -8,6 +8,7 @@ export class AdminController {
         totalUsers: 100,
         totalCourses: 20,
         totalSudents: 80,
+        totalEnrollments: 150,
         activeUsers: 50,
       };
 
