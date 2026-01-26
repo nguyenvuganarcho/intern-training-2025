@@ -7,7 +7,10 @@ import { ClassController } from '../modules/class/class.controller';
 import { ScheduleController } from '../modules/schedule/schedule.controller';
 import { EnrollmentController } from '../modules/enrollment/enrollment.controller';
 import { GradeController } from '../modules/grade/grade.controller';
+import { NotificationController } from '../modules/notification/notification.controller';
+import { NewsController } from '../modules/news/news.controller';
 import { requireAuth, requireRole } from '../middlewares/auth.middleware';
+import { FeedbackController } from '../modules/feedback/feedback.controller';
 
 const router = Router();
 
@@ -69,4 +72,21 @@ router.post('/grades', requireAuth, requireRole(['admin', 'teacher']), gradeCont
 router.put('/grades/:id', requireAuth, requireRole(['admin', 'teacher']), gradeController.updateGrade)
 router.post('/grades/bulk', requireAuth, requireRole(['admin', 'teacher']), gradeController.bulkCreateGrades);
 
+const notificationController = new NotificationController();
+router.get('/notifications', requireAuth, notificationController.getAllNotifications);
+router.post('/notifications', requireAuth, requireRole(['admin']), notificationController.createNotification);
+router.put('/notifications/:id', requireAuth, notificationController.markAsRead);
+router.put('/notifications/mark-all-read', requireAuth, notificationController.markAllAsRead);
+
+const newsController = new NewsController();
+router.get('/news', newsController.getAllNews);
+router.get('/news/:id', newsController.getNewsById);
+router.post('/news', requireAuth, requireRole(['admin']), newsController.createNews);
+router.put('/news/:id', requireAuth, requireRole(['admin']), newsController.updateNews);
+router.delete('/news/:id', requireAuth, requireRole(['admin']), newsController.deleteNews);
+
+const feedbackController = new FeedbackController();
+router.get('/feedback', requireAuth, feedbackController.getAllFeedbacks);
+router.post('/feedback', requireAuth, feedbackController.createFeedback);
+router.put('/feedback/:id', requireAuth, requireRole(['admin']), feedbackController.updateFeedback);
 export default router;
