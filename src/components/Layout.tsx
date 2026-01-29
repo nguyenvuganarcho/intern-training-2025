@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Outlet, Link } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate, Outlet, Link } from "react-router-dom";
 import {
   Box,
   Drawer,
@@ -15,7 +15,7 @@ import {
   Divider,
   Menu,
   MenuItem,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Dashboard as DashboardIcon,
   People as PeopleIcon,
@@ -25,8 +25,9 @@ import {
   Grade as GradeIcon,
   AccountCircle,
   Menu as MenuIcon,
-} from '@mui/icons-material';
-import { getUser, removeToken } from '../utils/auth';
+} from "@mui/icons-material";
+import { Settings as SettingsIcon } from "@mui/icons-material";
+import { getUser, removeToken } from "../utils/auth";
 
 const drawerWidth = 240;
 
@@ -42,15 +43,47 @@ export default function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Menu items
-  const menuItems: MenuItem[] = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Students', icon: <PeopleIcon />, path: '/students' },
-    { text: 'Teachers', icon: <SchoolIcon />, path: '/teachers' },
-    { text: 'Courses', icon: <BookIcon />, path: '/courses' },
-    { text: 'Classes', icon: <ClassIcon />, path: '/classes' },
-    { text: 'Grades', icon: <GradeIcon />, path: '/grades' },
-  ];
+  const getMenuItems = () => {
+    const baseItems: MenuItem[] = [
+      { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
+    ];
+
+    // Admin: All menus
+    if (user?.role === "admin") {
+      return [
+        ...baseItems,
+        { text: "Students", icon: <PeopleIcon />, path: "/students" },
+        { text: "Teachers", icon: <SchoolIcon />, path: "/teachers" },
+        { text: "Courses", icon: <BookIcon />, path: "/courses" },
+        { text: "Classes", icon: <ClassIcon />, path: "/classes" },
+        { text: "Grades", icon: <GradeIcon />, path: "/grades" },
+      ];
+    }
+
+    // Teacher: Limited menus
+    if (user?.role === "teacher") {
+      return [
+        ...baseItems,
+        { text: "Students", icon: <PeopleIcon />, path: "/students" },
+        { text: "Courses", icon: <BookIcon />, path: "/courses" },
+        { text: "Grades", icon: <GradeIcon />, path: "/grades" },
+      ];
+    }
+
+    // Student: Very limited
+    if (user?.role === "student") {
+      return [
+        ...baseItems,
+        { text: 'Enrollment', icon: <SchoolIcon />, path: '/enrollment' },
+        { text: "My Courses", icon: <BookIcon />, path: "/my-courses" },
+        { text: "My Grades", icon: <GradeIcon />, path: "/my-grades" },
+      ];
+    }
+
+    return baseItems;
+  };
+
+  const menuItems = getMenuItems();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -66,7 +99,7 @@ export default function Layout() {
 
   const handleLogout = () => {
     removeToken();
-    navigate('/login');
+    navigate("/login");
   };
 
   const drawer = (
@@ -95,7 +128,7 @@ export default function Layout() {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       {/* AppBar - Top bar */}
       <AppBar
         position="fixed"
@@ -109,23 +142,19 @@ export default function Layout() {
             color="inherit"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { sm: "none" } }}
           >
             <MenuIcon />
           </IconButton>
-          
+
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Student Management System
           </Typography>
 
           {/* User menu */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="body2">{user?.fullName}</Typography>
-            <IconButton
-              size="large"
-              onClick={handleMenuOpen}
-              color="inherit"
-            >
+            <IconButton size="large" onClick={handleMenuOpen} color="inherit">
               <AccountCircle />
             </IconButton>
           </Box>
@@ -141,6 +170,18 @@ export default function Layout() {
               </Typography>
             </MenuItem>
             <Divider />
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                navigate("/profile");
+              }}
+            >
+              <ListItemIcon>
+                <SettingsIcon fontSize="small" />
+              </ListItemIcon>
+              Profile Settings
+            </MenuItem>
+
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Toolbar>
@@ -160,8 +201,11 @@ export default function Layout() {
             keepMounted: true,
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
         >
           {drawer}
@@ -171,8 +215,11 @@ export default function Layout() {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
           open
         >

@@ -28,3 +28,188 @@ export interface ApiResponse<T> {
   timestamp?: string;
   path?: string;
 }
+
+export interface Student {
+  studentId: number;
+  userId: number;
+  studentCode: string;
+  fullName: string;
+  dateOfBirth?: string;
+  phone?: string;
+  address?: string;
+  email: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateStudentDto {
+  userId: number;
+  studentCode: string;
+  dateOfBirth?: string;
+  phone?: string;
+  address?: string;
+}
+
+export interface UpdateStudentDto {
+  fullName?: string;
+  dateOfBirth?: string;
+  phone?: string;
+  address?: string;
+}
+
+export interface StudentListResponse {
+  students: Student[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
+}
+
+export interface UpdateProfileDto {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  dateOfBirth?: string;
+}
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordRequest extends ChangePasswordDto {
+  confirmPassword: string;
+}
+
+// Teacher types
+export interface Teacher {
+  teacherId: number;
+  userId: number;
+  teacherCode: string;
+  fullName: string;
+  dateOfBirth?: string;
+  phone?: string;
+  address?: string;
+  email?: string;
+  status?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateTeacherDto {
+  fullName?: string;
+  dateOfBirth?: string;
+  phone?: string;
+  address?: string;
+}
+
+export interface TeacherListResponse {
+  teachers: Teacher[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
+}
+
+export interface CreateTeacherDto {
+  userId: number;
+  teacherCode: string;
+  fullName: string;
+  dateOfBirth?: string;
+  phone?: string;
+  address?: string;
+}
+
+// Course types
+export interface Course {
+  courseId: number;
+  courseCode: string;
+  courseName: string;
+  credits: number;
+  teacherId: number;
+  teacherName?: string;
+  teacherCode?: string;
+  createdAt: string;
+}
+
+export interface CreateCourseDto {
+  courseCode: string;
+  courseName: string;
+  credits: number;
+  teacherId: number;
+}
+
+export interface UpdateCourseDto {
+  courseCode?: string;
+  courseName?: string;
+  credits?: number;
+  teacherId?: number;
+}
+
+export interface CourseListResponse {
+  courses: Course[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
+}
+
+// Class types
+export interface Class {
+  classId: number;
+  courseId: number;
+  className: string;
+  courseCode?: string;
+  courseName?: string;
+  teacherName?: string;
+  createdAt: string;
+}
+
+export interface CreateClassDto {
+  courseId: number;
+  className: string;
+}
+
+export interface UpdateClassDto {
+  courseId?: number;
+  className?: string;
+}
+
+export interface ClassListResponse {
+  classes: Class[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
+}
+
+export interface Enrollment {
+  enrollId: number;
+  studentId: number;
+  studentCode: string;
+  studentName: string;
+  courseId: number;
+  courseCode: string;
+  courseName: string;
+  credits: number;
+  teacherId: number;
+  teacherName: string;
+  status: 'enrolled' | 'dropped';
+  enrolledAt: string;
+  finalScore?: number;
+}
+
+export interface CreateEnrollmentDto {
+  studentId: number;
+  courseId: number;
+}
+
+export interface EnrollmentListResponse {
+  enrollments: Enrollment[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
+}

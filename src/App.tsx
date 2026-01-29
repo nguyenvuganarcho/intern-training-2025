@@ -9,7 +9,9 @@ import Teachers from './pages/Teachers';
 import Courses from './pages/Courses';
 import Classes from './pages/Classes';
 import Grades from './pages/Grades';
+import Enrollment from './pages/Enrollment';
 import Layout from './components/Layout';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -38,6 +40,8 @@ function App() {
             <Route path="courses" element={<Courses />} />
             <Route path="classes" element={<Classes />} />
             <Route path="grades" element={<Grades />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="enrollment" element={<Enrollment />} />
           </Route>
           
           {/* Catch all */}
