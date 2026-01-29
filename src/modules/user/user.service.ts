@@ -18,41 +18,42 @@ export class UserService {
   }
 
   private toUserResponseDto(user: any): UserResponseDto {
-    const response: UserResponseDto = {
-      userId: user.userId,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-      createdAt: user.createdAt.toISOString(),
+  const response: UserResponseDto = {
+    userId: user.userId,
+    username: user.username,
+    email: user.email,
+    fullName: user.studentName || user.teacherName || null, 
+    role: user.role,
+    status: user.status,
+    createdAt: user.createdAt.toISOString(),
+  };
+
+  // Add student profile if exists
+  if (user.studentId) {
+    response.profile = {
+      studentId: user.studentId,
+      studentCode: user.studentCode,
+      fullName: user.studentName,
+      dateOfBirth: user.studentDOB ? user.studentDOB.toISOString().split('T')[0] : undefined,
+      phone: user.studentPhone,
+      address: user.studentAddress,
     };
-
-    // Add student profile if exists
-    if (user.studentId) {
-      response.profile = {
-        studentId: user.studentId,
-        studentCode: user.studentCode,
-        fullName: user.studentName,
-        dateOfBirth: user.studentDOB ? user.studentDOB.toISOString().split('T')[0] : undefined,
-        phone: user.studentPhone,
-        address: user.studentAddress,
-      };
-    }
-
-    // Add teacher profile if exists
-    if (user.teacherId) {
-      response.profile = {
-        teacherId: user.teacherId,
-        teacherCode: user.teacherCode,
-        fullName: user.teacherName,
-        dateOfBirth: user.teacherDOB ? user.teacherDOB.toISOString().split('T')[0] : undefined,
-        phone: user.teacherPhone,
-        address: user.teacherAddress,
-      };
-    }
-
-    return response;
   }
+
+  // Add teacher profile if exists
+  if (user.teacherId) {
+    response.profile = {
+      teacherId: user.teacherId,
+      teacherCode: user.teacherCode,
+      fullName: user.teacherName,
+      dateOfBirth: user.teacherDOB ? user.teacherDOB.toISOString().split('T')[0] : undefined,
+      phone: user.teacherPhone,
+      address: user.teacherAddress,
+    };
+  }
+
+  return response;
+}
 
   async createUser(createDto: CreateUserDto): Promise<UserResponseDto> {
     // 1. Check username unique

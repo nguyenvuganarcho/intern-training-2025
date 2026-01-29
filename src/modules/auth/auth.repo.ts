@@ -4,26 +4,37 @@ import { User } from './auth.dto';
 
 export class AuthRepository {
   // Find user by username
-  async findByUsername(username: string): Promise<User | null> {
-    try {
-      const pool = getPool();
-      const result = await pool
-        .request()
-        .input('username', sql.NVarChar, username)
-        .query(`
-          SELECT 
-            userId, username, password, email, role, status,
-            lockedUntil, failedLoginAttempts, createdAt
-          FROM users
-          WHERE username = @username
-        `);
+  async findByUsername(username: string): Promise<any> {
+  try {
+    const pool = getPool();
+    const result = await pool
+      .request()
+      .input('username', sql.NVarChar, username)
+      .query(`
+        SELECT 
+          u.userId, 
+          u.username, 
+          u.password, 
+          u.email, 
+          u.role, 
+          u.status,
+          u.createdAt,
+          u.failedLoginAttempts,
+          u.lockedUntil,
+          s.fullName as studentName,   
+          t.fullName as teacherName     
+        FROM users u
+        LEFT JOIN students s ON u.userId = s.userId   
+        LEFT JOIN teachers t ON u.userId = t.userId  
+        WHERE u.username = @username
+      `);
 
-      return result.recordset[0] || null;
-    } catch (error) {
-      console.error('Error finding user by username:', error);
-      throw error;
-    }
+    return result.recordset[0] || null;
+  } catch (error) {
+    console.error('Error finding user by username:', error);
+    throw error;
   }
+}
 
   // Find user by email
   async findByEmail(email: string): Promise<User | null> {

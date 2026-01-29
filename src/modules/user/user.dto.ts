@@ -29,6 +29,7 @@ export interface UserResponseDto {
   userId: number;
   username: string;
   email: string;
+   fullName?: string | null;  
   role: string;
   status: string;
   createdAt: string;

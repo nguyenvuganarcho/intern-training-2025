@@ -25,6 +25,7 @@ export interface UserResponseDto {
   userId: number;
   username: string;
   email: string;
+  fullName: string | null; 
   role: string;
   status: string;
 }
@@ -48,3 +49,4 @@ export interface TokenPayload {
   email: string;
   role: string;
 }
+

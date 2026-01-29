@@ -46,6 +46,7 @@ export class AuthService {
       userId: user.userId,
       username: user.username,
       email: user.email,
+      fullName: user.studentName || user.teacherName || null,
       role: user.role,
       status: user.status,
     };

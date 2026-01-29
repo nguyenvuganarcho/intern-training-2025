@@ -1,7 +1,9 @@
+
 import { Router } from 'express';
 import { AuthController } from '../modules/auth/auth.controller';
 import { UserController } from '../modules/user/user.controller';
 import { StudentController } from '../modules/student/student.controller';
+import { TeacherController } from '../modules/teacher/teacher.controller';
 import { CourseController } from '../modules/course/course.controller';
 import { ClassController } from '../modules/class/class.controller';
 import { ScheduleController } from '../modules/schedule/schedule.controller';
@@ -29,7 +31,7 @@ router.get('/users/:id', requireAuth, requireRole(['admin']), userController.get
 router.post('/users', requireAuth, requireRole(['admin']), userController.createUser);
 router.put('/users/:id', requireAuth, requireRole(['admin']), userController.updateUser);
 router.delete('/users/:id', requireAuth, requireRole(['admin']), userController.deleteUser);
-router.put('/users/:id/password', requireAuth, requireRole(['admin']), userController.changePassword);
+router.put('/users/:id/password', requireAuth, userController.changePassword);
 
 const studentController = new StudentController();
 router.get('/students', requireAuth, requireRole(['admin', 'teacher']), studentController.getAllStudents);
@@ -37,6 +39,13 @@ router.get('/students/:id', requireAuth, studentController.getStudentById);
 router.put('/students/:id', requireAuth, requireRole(['admin']), studentController.updateStudent);
 router.delete('/students/:id', requireAuth, requireRole(['admin']), studentController.deleteStudent);
 router.get('/students/:id/grades', requireAuth, studentController.getStudentGrades);
+
+const teacherController = new TeacherController();
+router.get('/teachers', requireAuth, requireRole(['admin', 'teacher']), teacherController.getAllTeachers);
+router.get('/teachers/:id', requireAuth, teacherController.getTeacherById);
+router.put('/teachers/:id', requireAuth, requireRole(['admin']), teacherController.updateTeacher);
+router.delete('/teachers/:id', requireAuth, requireRole(['admin']), teacherController.deleteTeacher);
+router.get('/teachers/:id/courses', requireAuth, teacherController.getTeacherCourses);
 
 const courseController = new CourseController();
 router.get('/courses/available', requireAuth, courseController.getAvailableCourses);
