@@ -21,7 +21,9 @@ export class AuthRepository {
           u.createdAt,
           u.failedLoginAttempts,
           u.lockedUntil,
-          s.fullName as studentName,   
+          s.studentId,
+          s.fullName as studentName,  
+          t.teacherId, 
           t.fullName as teacherName     
         FROM users u
         LEFT JOIN students s ON u.userId = s.userId   

@@ -57,7 +57,7 @@ router.delete('/courses/:id', requireAuth, requireRole(['admin']), courseControl
 router.get('/courses/:id/classes', requireAuth, courseController.getCourseClasses);
 
 const classController = new ClassController();
-router.get('/classes', requireAuth, requireRole(['admin', 'teacher']), classController.getAllClasses);
+router.get('/classes', requireAuth, classController.getAllClasses);
 router.get('/classes/:id', requireAuth, classController.getClassById);
 router.post('/classes', requireAuth, requireRole(['admin']), classController.createClass);
 router.put('/classes/:id', requireAuth, requireRole(['admin']), classController.updateClass);
@@ -66,14 +66,15 @@ router.get('/classes/:id/students', requireAuth, requireRole(['admin', 'teacher'
 
 const scheduleController = new ScheduleController();
 router.post('/schedules/check-conflict', requireAuth, requireRole(['admin']), scheduleController.checkConflict); 
-router.get('/schedules', requireAuth, requireRole(['admin', 'teacher']), scheduleController.getAllSchedules);
+router.get('/schedules', requireAuth, scheduleController.getAllSchedules);
 router.post('/schedules', requireAuth, requireRole(['admin']), scheduleController.createSchedule);
 router.put('/schedules/:id', requireAuth, requireRole(['admin']), scheduleController.updateSchedule);
 router.delete('/schedules/:id', requireAuth, requireRole(['admin']), scheduleController.deleteSchedule);
 
 const enrollmentController = new EnrollmentController();
-router.get('/enrollments', requireAuth, requireRole(['admin', 'teacher']), enrollmentController.getAllEnrollments);
+router.get('/enrollments', requireAuth, enrollmentController.getAllEnrollments);
 router.post('/enrollments', requireAuth, enrollmentController.createEnrollment);
+router.put('/enrollments/:id/class', requireAuth, enrollmentController.selectClass); 
 router.delete('/enrollments/:id', requireAuth, enrollmentController.deleteEnrollment);
 
 const gradeController = new GradeController();

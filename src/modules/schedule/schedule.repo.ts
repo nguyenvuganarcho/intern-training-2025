@@ -1,6 +1,11 @@
-import sql from 'mssql';
-import { getPool } from '../../config/database';
-import { CreateScheduleDto, UpdateScheduleDto, PaginationQuery, CheckConflictDto } from './schedule.dto';
+import sql from "mssql";
+import { getPool } from "../../config/database";
+import {
+  CreateScheduleDto,
+  UpdateScheduleDto,
+  PaginationQuery,
+  CheckConflictDto,
+} from "./schedule.dto";
 
 export class ScheduleRepository {
   // Create schedule
@@ -9,12 +14,11 @@ export class ScheduleRepository {
       const pool = getPool();
       const result = await pool
         .request()
-        .input('classId', sql.Int, createDto.classId)
-        .input('dayOfTheWeek', sql.NVarChar, createDto.dayOfTheWeek)
-        .input('startTime', sql.Time, createDto.startTime)
-        .input('endTime', sql.Time, createDto.endTime)
-        .input('room', sql.NVarChar, createDto.room)
-        .query(`
+        .input("classId", sql.Int, createDto.classId)
+        .input("dayOfTheWeek", sql.NVarChar, createDto.dayOfTheWeek)
+        .input("startTime", sql.Time, createDto.startTime)
+        .input("endTime", sql.Time, createDto.endTime)
+        .input("room", sql.NVarChar, createDto.room).query(`
           INSERT INTO schedules (classId, dayOfTheWeek, startTime, endTime, room)
           OUTPUT INSERTED.*
           VALUES (@classId, @dayOfTheWeek, @startTime, @endTime, @room)
@@ -22,46 +26,61 @@ export class ScheduleRepository {
 
       return result.recordset[0];
     } catch (error) {
-      console.error('Error creating schedule:', error);
+      console.error("Error creating schedule:", error);
       throw error;
     }
   }
 
   // Find all schedules with pagination
-  async findAll(query: PaginationQuery): Promise<{ schedules: any[]; total: number }> {
+  async findAll(
+    query: PaginationQuery,
+  ): Promise<{ schedules: any[]; total: number }> {
     try {
       const pool = getPool();
-      const { page = 1, size = 10, search, classId, teacherId, dayOfTheWeek, room } = query;
+      const {
+        page = 1,
+        size = 10,
+        search,
+        classId,
+        teacherId,
+        dayOfTheWeek,
+        room,
+      } = query;
 
       let whereConditions: string[] = [];
       const request = pool.request();
 
       if (search) {
-        whereConditions.push(`(cl.className LIKE @search OR c.courseName LIKE @search OR c.courseCode LIKE @search OR s.room LIKE @search)`);
-        request.input('search', sql.NVarChar, `%${search}%`);
+        whereConditions.push(
+          `(cl.className LIKE @search OR c.courseName LIKE @search OR c.courseCode LIKE @search OR s.room LIKE @search)`,
+        );
+        request.input("search", sql.NVarChar, `%${search}%`);
       }
 
       if (classId) {
-        whereConditions.push('s.classId = @classId');
-        request.input('classId', sql.Int, classId);
+        whereConditions.push("s.classId = @classId");
+        request.input("classId", sql.Int, classId);
       }
 
       if (teacherId) {
-        whereConditions.push('c.teacherId = @teacherId');
-        request.input('teacherId', sql.Int, teacherId);
+        whereConditions.push("c.teacherId = @teacherId");
+        request.input("teacherId", sql.Int, teacherId);
       }
 
       if (dayOfTheWeek) {
-        whereConditions.push('s.dayOfTheWeek = @dayOfTheWeek');
-        request.input('dayOfTheWeek', sql.NVarChar, dayOfTheWeek);
+        whereConditions.push("s.dayOfTheWeek = @dayOfTheWeek");
+        request.input("dayOfTheWeek", sql.NVarChar, dayOfTheWeek);
       }
 
       if (room) {
-        whereConditions.push('s.room LIKE @room');
-        request.input('room', sql.NVarChar, `%${room}%`);
+        whereConditions.push("s.room LIKE @room");
+        request.input("room", sql.NVarChar, `%${room}%`);
       }
 
-      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+      const whereClause =
+        whereConditions.length > 0
+          ? `WHERE ${whereConditions.join(" AND ")}`
+          : "";
 
       // Count total
       const countResult = await request.query(`
@@ -76,12 +95,15 @@ export class ScheduleRepository {
 
       // Get paginated data
       const offset = (page - 1) * size;
-      request.input('offset', sql.Int, offset);
-      request.input('size', sql.Int, size);
+      request.input("offset", sql.Int, offset);
+      request.input("size", sql.Int, size);
 
       const dataResult = await request.query(`
         SELECT 
-          s.scheduleId, s.classId, s.dayOfTheWeek, s.startTime, s.endTime, s.room, s.createdAt,
+          s.scheduleId, s.classId, s.dayOfTheWeek,
+          CONVERT(VARCHAR(8), s.startTime, 108) as startTime,
+          CONVERT(VARCHAR(8), s.endTime, 108) as endTime,
+          s.room, s.createdAt,
           cl.className,
           c.courseId, c.courseCode, c.courseName, c.teacherId,
           t.fullName as teacherName
@@ -109,7 +131,7 @@ export class ScheduleRepository {
         total,
       };
     } catch (error) {
-      console.error('Error finding all schedules:', error);
+      console.error("Error finding all schedules:", error);
       throw error;
     }
   }
@@ -120,10 +142,12 @@ export class ScheduleRepository {
       const pool = getPool();
       const result = await pool
         .request()
-        .input('scheduleId', sql.Int, scheduleId)
-        .query(`
+        .input("scheduleId", sql.Int, scheduleId).query(`
           SELECT 
-            s.scheduleId, s.classId, s.dayOfTheWeek, s.startTime, s.endTime, s.room, s.createdAt,
+            s.scheduleId, s.classId, s.dayOfTheWeek, 
+            CONVERT(VARCHAR(8), s.startTime, 108) as startTime,
+            CONVERT(VARCHAR(8), s.endTime, 108) as endTime,
+            s.room, s.createdAt,
             cl.className,
             c.courseId, c.courseCode, c.courseName, c.teacherId,
             t.fullName as teacherName
@@ -136,7 +160,7 @@ export class ScheduleRepository {
 
       return result.recordset[0] || null;
     } catch (error) {
-      console.error('Error finding schedule by ID:', error);
+      console.error("Error finding schedule by ID:", error);
       throw error;
     }
   }
@@ -146,26 +170,26 @@ export class ScheduleRepository {
     try {
       const pool = getPool();
       const fields: string[] = [];
-      const request = pool.request().input('scheduleId', sql.Int, scheduleId);
+      const request = pool.request().input("scheduleId", sql.Int, scheduleId);
 
       if (updateDto.dayOfTheWeek !== undefined) {
-        fields.push('dayOfTheWeek = @dayOfTheWeek');
-        request.input('dayOfTheWeek', sql.NVarChar, updateDto.dayOfTheWeek);
+        fields.push("dayOfTheWeek = @dayOfTheWeek");
+        request.input("dayOfTheWeek", sql.NVarChar, updateDto.dayOfTheWeek);
       }
 
       if (updateDto.startTime !== undefined) {
-        fields.push('startTime = @startTime');
-        request.input('startTime', sql.Time, updateDto.startTime);
+        fields.push("startTime = @startTime");
+        request.input("startTime", sql.Time, updateDto.startTime);
       }
 
       if (updateDto.endTime !== undefined) {
-        fields.push('endTime = @endTime');
-        request.input('endTime', sql.Time, updateDto.endTime);
+        fields.push("endTime = @endTime");
+        request.input("endTime", sql.Time, updateDto.endTime);
       }
 
       if (updateDto.room !== undefined) {
-        fields.push('room = @room');
-        request.input('room', sql.NVarChar, updateDto.room);
+        fields.push("room = @room");
+        request.input("room", sql.NVarChar, updateDto.room);
       }
 
       if (fields.length === 0) {
@@ -174,13 +198,13 @@ export class ScheduleRepository {
 
       await request.query(`
         UPDATE schedules
-        SET ${fields.join(', ')}
+        SET ${fields.join(", ")}
         WHERE scheduleId = @scheduleId
       `);
 
       return await this.findById(scheduleId);
     } catch (error) {
-      console.error('Error updating schedule:', error);
+      console.error("Error updating schedule:", error);
       throw error;
     }
   }
@@ -191,15 +215,14 @@ export class ScheduleRepository {
       const pool = getPool();
       const result = await pool
         .request()
-        .input('scheduleId', sql.Int, scheduleId)
-        .query(`
+        .input("scheduleId", sql.Int, scheduleId).query(`
           DELETE FROM schedules
           WHERE scheduleId = @scheduleId
         `);
 
       return result.rowsAffected[0] > 0;
     } catch (error) {
-      console.error('Error deleting schedule:', error);
+      console.error("Error deleting schedule:", error);
       throw error;
     }
   }
@@ -208,13 +231,14 @@ export class ScheduleRepository {
   async checkConflicts(dto: CheckConflictDto): Promise<any[]> {
     try {
       const pool = getPool();
-      const request = pool.request()
-        .input('classId', sql.Int, dto.classId)
-        .input('dayOfTheWeek', sql.NVarChar, dto.dayOfTheWeek)
-        .input('startTime', sql.Time, dto.startTime)
-        .input('endTime', sql.Time, dto.endTime)
-        .input('room', sql.NVarChar, dto.room)
-        .input('excludeScheduleId', sql.Int, dto.excludeScheduleId || 0);
+      const request = pool
+        .request()
+        .input("classId", sql.Int, dto.classId)
+        .input("dayOfTheWeek", sql.NVarChar, dto.dayOfTheWeek)
+        .input("startTime", sql.Time, dto.startTime)
+        .input("endTime", sql.Time, dto.endTime)
+        .input("room", sql.NVarChar, dto.room)
+        .input("excludeScheduleId", sql.Int, dto.excludeScheduleId || 0);
 
       // Get class info
       const classInfo = await request.query(`
@@ -233,14 +257,15 @@ export class ScheduleRepository {
       // Check room conflict
       const roomConflicts = await pool
         .request()
-        .input('dayOfTheWeek', sql.NVarChar, dto.dayOfTheWeek)
-        .input('startTime', sql.Time, dto.startTime)
-        .input('endTime', sql.Time, dto.endTime)
-        .input('room', sql.NVarChar, dto.room)
-        .input('excludeScheduleId', sql.Int, dto.excludeScheduleId || 0)
-        .query(`
+        .input("dayOfTheWeek", sql.NVarChar, dto.dayOfTheWeek)
+        .input("startTime", sql.Time, dto.startTime)
+        .input("endTime", sql.Time, dto.endTime)
+        .input("room", sql.NVarChar, dto.room)
+        .input("excludeScheduleId", sql.Int, dto.excludeScheduleId || 0).query(`
           SELECT 
-            s.scheduleId, s.classId, s.dayOfTheWeek, s.startTime, s.endTime, s.room,
+            s.scheduleId, s.classId, s.dayOfTheWeek,
+            CONVERT(VARCHAR(8), s.startTime, 108) as startTime,
+            CONVERT(VARCHAR(8), s.endTime, 108) as endTime, s.room,
             cl.className,
             c.courseCode, c.courseName,
             t.fullName as teacherName,
@@ -260,20 +285,21 @@ export class ScheduleRepository {
       // Check teacher conflict
       const teacherConflicts = await pool
         .request()
-        .input('teacherId', sql.Int, teacherId)
-        .input('dayOfTheWeek', sql.NVarChar, dto.dayOfTheWeek)
-        .input('startTime', sql.Time, dto.startTime)
-        .input('endTime', sql.Time, dto.endTime)
-        .input('excludeScheduleId', sql.Int, dto.excludeScheduleId || 0)
-        .query(`
+        .input("teacherId", sql.Int, teacherId)
+        .input("dayOfTheWeek", sql.NVarChar, dto.dayOfTheWeek)
+        .input("startTime", sql.Time, dto.startTime)
+        .input("endTime", sql.Time, dto.endTime)
+        .input("excludeScheduleId", sql.Int, dto.excludeScheduleId || 0).query(`
           SELECT 
-            s.scheduleId, s.classId, s.dayOfTheWeek, s.startTime, s.endTime, s.room,
+            s.scheduleId, s.classId, s.dayOfTheWeek,
+            CONVERT(VARCHAR(8), s.startTime, 108) as startTime,
+            CONVERT(VARCHAR(8), s.endTime, 108) as endTime, s.room,
             cl.className,
             c.courseCode, c.courseName,
             t.fullName as teacherName,
             'teacher' as conflictType
           FROM schedules s
-          INNER JOIN classes cl ON s.classId = cl.classId
+          INNER JOIN classes cl ON s.classId = cl.classId 
           INNER JOIN courses c ON cl.courseId = c.courseId
           LEFT JOIN teachers t ON c.teacherId = t.teacherId
           WHERE s.scheduleId != @excludeScheduleId
@@ -286,7 +312,7 @@ export class ScheduleRepository {
 
       return [...roomConflicts.recordset, ...teacherConflicts.recordset];
     } catch (error) {
-      console.error('Error checking conflicts:', error);
+      console.error("Error checking conflicts:", error);
       throw error;
     }
   }

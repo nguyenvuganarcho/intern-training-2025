@@ -28,6 +28,8 @@ export interface UserResponseDto {
   fullName: string | null; 
   role: string;
   status: string;
+  studentId?: number | null;
+  teacherId?: number | null; 
 }
 
 export interface RefreshTokenRequestDto {

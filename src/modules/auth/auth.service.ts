@@ -49,6 +49,8 @@ export class AuthService {
       fullName: user.studentName || user.teacherName || null,
       role: user.role,
       status: user.status,
+      studentId: user.studentId || null,
+      teacherId: user.teacherId || null,
     };
   }
 

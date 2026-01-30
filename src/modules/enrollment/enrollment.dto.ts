@@ -6,6 +6,8 @@ export interface EnrollmentDto {
   courseId: number;
   courseCode: string;
   courseName: string;
+  classId?: number | null;      
+  className?: string | null;
   credits: number;
   teacherId: number;
   teacherName: string;
