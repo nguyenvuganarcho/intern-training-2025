@@ -12,7 +12,11 @@ import Grades from './pages/Grades';
 import Enrollment from './pages/Enrollment';
 import Layout from './components/Layout';
 import Profile from './pages/Profile';
+import Schedule from './pages/Schedule';
+import MyGrades from './pages/Grades';
+import GradeManagement from './pages/GradeManagement';
 import ProtectedRoute from './components/ProtectedRoute';
+
 
 function App() {
   return (
@@ -42,8 +46,9 @@ function App() {
             <Route path="grades" element={<Grades />} />
             <Route path="profile" element={<Profile />} />
             <Route path="enrollment" element={<Enrollment />} />
+            <Route path="schedule" element={<Schedule />} />
+            <Route path="grades" element={user?.role === 'student' ? <MyGrades /> : <GradeManagement />} />
           </Route>
-          
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

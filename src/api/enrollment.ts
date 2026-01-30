@@ -32,3 +32,9 @@ export const enrollCourseApi = async (data: CreateEnrollmentDto): Promise<Enroll
 export const dropEnrollmentApi = async (enrollId: number): Promise<void> => {
   await client.delete(`/enrollments/${enrollId}`);
 };
+
+// Select class for enrollment
+export const selectClassApi = async (enrollId: number, classId: number): Promise<Enrollment> => {
+  const response = await client.put<ApiResponse<Enrollment>>(`/enrollments/${enrollId}/class`, { classId });
+  return response.data.data;
+};

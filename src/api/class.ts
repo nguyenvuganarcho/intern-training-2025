@@ -52,3 +52,8 @@ export const getCoursesForDropdownApi = async (): Promise<Course[]> => {
     courseName: c.courseName,
   }));
 };
+
+export const getClassesByCourseApi = async (courseId: number): Promise<Class[]> => {
+  const response = await client.get<ApiResponse<ClassListResponse>>(`/classes?courseId=${courseId}&size=100`);
+  return response.data.data.classes;
+};

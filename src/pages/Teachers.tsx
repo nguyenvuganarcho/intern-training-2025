@@ -15,7 +15,7 @@ import {
   Paper,
 } from '@mui/material';
 import { DataGrid, type GridColDef, type GridPaginationModel } from '@mui/x-data-grid';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {  Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import {
   getTeachersApi,
   updateTeacherApi,
@@ -64,7 +64,6 @@ export default function Teachers() {
   // Check permissions
   const canEdit = user?.role === 'admin';
   const canDelete = user?.role === 'admin';
-  const canCreate = user?.role === 'admin';
 
   // Show snackbar
   const showSnackbar = useCallback((message: string, severity: 'success' | 'error') => {
@@ -98,21 +97,6 @@ export default function Teachers() {
   const handleSearch = () => {
     setPaginationModel({ ...paginationModel, page: 0 });
   };
-
-  const handleOpenCreate = () => {
-  if (!canCreate) {
-    showSnackbar('You do not have permission to create teachers', 'error');
-    return;
-  }
-  setEditingTeacher(null);
-  setFormData({
-    fullName: '',
-    dateOfBirth: '',
-    phone: '',
-    address: '',
-  });
-  setOpenDialog(true);
-};
 
   // Open edit dialog
   const handleOpenEdit = (teacher: Teacher) => {
@@ -155,7 +139,7 @@ export default function Teachers() {
         phone: formData.phone || undefined,
         address: formData.address || undefined,
       };
-      await updateTeacherApi(editingTeacher.userId, updateData);
+      await updateTeacherApi(editingTeacher.teacherId, updateData);
       showSnackbar('Teacher updated successfully', 'success');
       
       handleCloseDialog();
@@ -167,7 +151,7 @@ export default function Teachers() {
   };
 
   // Handle delete
-  const handleDelete = async (userId: number) => {
+  const handleDelete = async (teacherId: number) => {
     if (!canDelete) {
       showSnackbar('You do not have permission to delete teachers', 'error');
       return;
@@ -178,7 +162,7 @@ export default function Teachers() {
     }
 
     try {
-      await deleteTeacherApi(userId);
+      await deleteTeacherApi(teacherId);
       showSnackbar('Teacher deleted successfully', 'success');
       fetchTeachers();
     } catch (error: unknown) {
@@ -233,7 +217,7 @@ export default function Teachers() {
             <IconButton
               size="small"
               color="error"
-              onClick={() => handleDelete(params.row.userId)}
+              onClick={() => handleDelete(params.row.teacherId)}
             >
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -252,15 +236,6 @@ export default function Teachers() {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">Teachers</Typography>
-        {canCreate && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleOpenCreate}
-          >
-            Add Teacher
-          </Button>
-        )}
       </Box>
 
       {/* Role info banner */}

@@ -28,6 +28,7 @@ import {
 } from "@mui/icons-material";
 import { Settings as SettingsIcon } from "@mui/icons-material";
 import { getUser, removeToken } from "../utils/auth";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const drawerWidth = 240;
 
@@ -66,7 +67,8 @@ export default function Layout() {
         ...baseItems,
         { text: "Students", icon: <PeopleIcon />, path: "/students" },
         { text: "Courses", icon: <BookIcon />, path: "/courses" },
-        { text: "Grades", icon: <GradeIcon />, path: "/grades" },
+        { text: 'My Schedule', icon: <CalendarMonthIcon />, path: '/schedule' },
+        { text: 'Grades', icon: <GradeIcon />, path: '/grades' },
       ];
     }
 
@@ -75,8 +77,8 @@ export default function Layout() {
       return [
         ...baseItems,
         { text: 'Enrollment', icon: <SchoolIcon />, path: '/enrollment' },
-        { text: "My Courses", icon: <BookIcon />, path: "/my-courses" },
-        { text: "My Grades", icon: <GradeIcon />, path: "/my-grades" },
+        { text: 'My Schedule', icon: <CalendarMonthIcon />, path: '/schedule' },
+        { text: 'My Grades', icon: <GradeIcon />, path: '/grades' },
       ];
     }
 

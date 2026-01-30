@@ -19,6 +19,8 @@ export interface User {
   email: string;
   fullName: string;
   role: 'admin' | 'teacher' | 'student';
+  studentId?: number | null;
+  teacherId?: number | null;
 }
 
 export interface ApiResponse<T> {
@@ -114,7 +116,9 @@ export interface TeacherListResponse {
 }
 
 export interface CreateTeacherDto {
-  userId: number;
+  username: string;
+  email: string;
+  password: string;
   teacherCode: string;
   fullName: string;
   dateOfBirth?: string;
@@ -193,6 +197,8 @@ export interface Enrollment {
   courseId: number;
   courseCode: string;
   courseName: string;
+  classId?: number | null;    
+  className?: string | null;
   credits: number;
   teacherId: number;
   teacherName: string;
@@ -212,4 +218,54 @@ export interface EnrollmentListResponse {
   page: number;
   size: number;
   totalPages: number;
+}
+
+// Schedule types
+export interface Schedule {
+  scheduleId: number;
+  classId: number;
+  className: string;
+  courseCode: string;
+  courseName: string;
+  teacherId: number;
+  teacherName: string;
+  dayOfTheWeek: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  startTime: string; 
+  endTime: string;    
+  room: string;
+  createdAt: string;
+}
+
+export interface CreateScheduleDto {
+  classId: number;
+  dayOfTheWeek: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  startTime: string;
+  endTime: string;
+  room: string;
+}
+
+export interface ScheduleListResponse {
+  schedules: Schedule[];
+  total: number;
+  page: number;
+  size: number;
+  totalPages: number;
+}
+
+// Grade types
+export interface Grade {
+  gradeId: number;
+  enrollId: number;
+  finalScore: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateGradeDto {
+  finalScore: number;
+}
+
+// Enrollment with grade info (for display)
+export interface EnrollmentWithGrade extends Enrollment {
+  gradeId?: number;
 }
