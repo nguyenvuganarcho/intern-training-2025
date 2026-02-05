@@ -1,0 +1,58 @@
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: student-db
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "123456"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - student-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./student-management-api
+      dockerfile: Dockerfile
+    image: student-backend:latest
+    container_name: student-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_SERVER: database
+      DB_DATABASE: student_management
+      DB_USER: sa
+      DB_PASSWORD: "123456"
+      JWT_SECRET: e27cb750e70afacacf5cbb22d313a8284ec057a392e441d39bab6626936b23d12769698a04802d53ad4f56eda332d339a86d7a8e290ad9f16f68e6e6730c6b18
+      JWT_REFRESH_SECRET: 5a2254743b41c81d400b814af4ce3249e838b2d70d95a876695d6dc2650020e560211c07fe7eb70cc8d887bd059df23f57eff4d1fb44e03687ec62b6d91e7c9f
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    networks:
+      - student-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./student-management-ui
+      dockerfile: Dockerfile
+    image: student-frontend:latest
+    container_name: student-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - student-network
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+
+networks:
+  student-network:
